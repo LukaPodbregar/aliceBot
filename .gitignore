@@ -1,1 +1,6 @@
 secaBotDjango/.env
+*.log
+*.pot
+__pycache__/
+*.py[cod]
+*$py.class
