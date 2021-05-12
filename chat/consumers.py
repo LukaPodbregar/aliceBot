@@ -1,6 +1,14 @@
 # chat/consumers.py
 import json
+import aiml
+import os
+
 from channels.generic.websocket import AsyncWebsocketConsumer
+
+os.chdir("D:/Programs/Anaconda/envs/py36/Lib/site-packages/aiml/botdata/alice")
+alice = aiml.Kernel()
+alice.learn("startup.xml")
+alice.respond("load alice")
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -26,13 +34,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-
+        response = alice.respond(message)
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': message
+                'message': message+"\nSmart Alice:" +response
             }
         )
 
