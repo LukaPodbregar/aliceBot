@@ -4,3 +4,5 @@ secaBotDjango/.env
 __pycache__/
 *.py[cod]
 *$py.class
+chat/__pycache__/consumers.cpython-37.pyc
+secaBotDjango/__pycache__/settings.cpython-37.pyc
