@@ -2,7 +2,7 @@
 import json
 import aiml
 import os
-from googletrans import Translator
+from google_trans_new import google_translator
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
@@ -10,7 +10,8 @@ os.chdir("D:/Programs/Anaconda/envs/py36/Lib/site-packages/aiml/botdata/alice")
 alice = aiml.Kernel()
 alice.learn("startup.xml")
 alice.respond("load alice")
-translator = Translator()
+translator = google_translator()
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -36,15 +37,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-        angMessage = translator.translate(message)
-        response = alice.respond(angMessage.text)
-        sloMessage = translator.translate(response)
+        language = text_data_json['language']
+        angMessage = translator.translate(message, lang_tgt=language)
+        response = alice.respond(angMessage)
+        sloMessage = translator.translate(response, lang_tgt=language)
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': "You: " +message+"\nSmart Alice:" +sloMessage + "\n"
+                'message': "You: " + message+"\nSmart Alice:" + sloMessage + "\n"
             }
         )
 
