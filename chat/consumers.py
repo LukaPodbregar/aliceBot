@@ -6,9 +6,13 @@ from google_trans_new import google_translator
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+#Change the path to your aiml library
 os.chdir("../Lib/site-packages/aiml/botdata/alice")
+#Initiating aiml Kernel
 alice = aiml.Kernel()
+#Initiating Alice with startup.xml
 alice.learn("startup.xml")
+#Learning aiml knowledge
 alice.respond("load alice")
 translator = google_translator()
 
@@ -37,16 +41,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
+        #Saving language that is selected in the UI
         language = text_data_json['language']
-        angMessage = translator.translate(message, lang_tgt='en')
-        response = alice.respond(angMessage)
-        sloMessage = translator.translate(response, lang_tgt=language)
+        #Checking if language is english or not english, the latter needs to be translated first and then translated back
+        if language is 'en':
+            response = alice.respond(message)
+        else:
+            #Message is translated to english
+            angMessage = translator.translate(message, lang_tgt='en')
+            #Create Alice's response to the message
+            responseAlice = alice.respond(angMessage)
+            #Translate the response to the proper language
+            response = translator.translate(responseAlice, lang_tgt=language)
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': "You: " + message+"\nSmart Alice:" + sloMessage + "\n"
+                'message': "You: " + message+"\nSmart Alice: " + response + "\n"
             }
         )
 
