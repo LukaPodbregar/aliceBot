@@ -12,6 +12,8 @@ os.chdir("../Lib/site-packages/aiml/botdata/alice")
 alice = aiml.Kernel()
 #Initiating Alice with startup.xml
 alice.learn("startup.xml")
+#Setting Alice's name
+alice.setPredicate("Alice", "name")
 #Learning aiml knowledge
 alice.respond("load alice")
 translator = google_translator()
